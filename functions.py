@@ -16,7 +16,6 @@ def main():
             print(f'Version: {version}, Header Length: {header_length}, Time To Live: {time_to_live}, Protocol: {protocol}, Source: {source}, Target: {target} ')
 
             # ICMP
-
             if protocol == 1:
                 icmp_type, code, checksum, data = icmp_packet(data)
                 print('ICMP Packet')
@@ -92,7 +91,5 @@ def udp_segment(data):
      source_port, destination_port, size, = struct.unpack('! H H 2x H', data[:8])
      return source_port, destination_port, size, data[8:]
     
-
-
 
 main()
