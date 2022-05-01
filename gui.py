@@ -1,5 +1,7 @@
 from PyQt5.QtWidgets import *
 import sys
+# import functions
+import networkProcess
 
 class UI(QMainWindow):
 	def __init__(self):
@@ -17,6 +19,7 @@ class UI(QMainWindow):
 		layout.addWidget(self.table_widget)
 
 		self.setCentralWidget(self.widget)
+		self.scan = False
 
 
 	def displayMenu(self):
@@ -44,12 +47,21 @@ class UI(QMainWindow):
 		self.show()
 
 	# Button functions
-
+	
 	def onClickStart(self):
-		pass
+		# adds a new row to the table on click of the button
+
+		# self.scan = True
+		connection = networkProcess.getConnection()
+		# infinite loop will need to be run in seperate thread instead
+		# while self.scan:
+			# self.table_widget.updateTable(networkProcess.main(connection))
+		self.table_widget.updateTable(networkProcess.main(connection))
+
+
 
 	def onClickStop(self):
-		pass
+		self.scan = False
 
 # Generate Table
 
@@ -67,19 +79,32 @@ class setTable(QWidget):
 		self.show()
 
 	def fetchTable(self):
+		# make a table with headers
 		self.tableWidget = QTableWidget()
-		self.tableWidget.setRowCount(10)
+		self.tableWidget.setRowCount(0)
 		self.tableWidget.setColumnCount(5)
 		self.tableWidget.setHorizontalHeaderLabels(['Protocol', 'Source IP', 'Destination IP', 'Source Port', 'Destination port'])
 		
-		self.tableWidget.setItem(0,0, QTableWidgetItem('test'))  # get items dynamically (functions.py)
+		# self.tableWidget.setItem(0,0, QTableWidgetItem('test'))  # get items dynamically (functions.py)
+
+
 		self.tableWidget.resizeColumnsToContents()
 
+	def updateTable(self,row):
+		# add a row to the end of the table
+		rowPos = self.tableWidget.rowCount()
+		self.tableWidget.insertRow(rowPos)
+		# self.tableWidget.setRowCount(self.tableWidget.rowCount()+1)
+		itemCount = 0
+		for item in row:
+			self.tableWidget.setItem(rowPos,itemCount, QTableWidgetItem(str(row[itemCount])))
+			itemCount+=1
 
 def main():
 	app = QApplication(sys.argv)
 	window = UI()
 	window.show()
+	
 
 	sys.exit(app.exec_())
 

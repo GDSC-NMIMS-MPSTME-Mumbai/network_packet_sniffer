@@ -2,45 +2,50 @@ import socket
 import struct
 
 # listen for packets (socket connection, infinite loop)
-def main():
+def getConnection():
     connection = socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.ntohs(3)) # connect and take care of big endian <-> little endian
-    while True:
-        raw_data, address = connection.recvfrom(65535)
-        destination_mac, source_mac, ethernet_protocol, data = get_ethernet_frame(raw_data)
-        print(f'Ethernet Frame:\n Destination: {destination_mac}, Source: {source_mac}, Protocol: {ethernet_protocol}')
+    return connection
 
-        if ethernet_protocol == 8:
-            version, header_length, time_to_live, protocol, source, target, data = ipv4_packet(data)
-            print('IPv4 Packet:')
-            print(f'Version: {version}, Header Length: {header_length}, Time To Live: {time_to_live}, Protocol: {protocol}, Source: {source}, Target: {target} ')
+def main(connection):
+    raw_data, address = connection.recvfrom(65535)
+    destination_mac, source_mac, ethernet_protocol, data = get_ethernet_frame(raw_data)
+    print(f'Ethernet Frame:\n Destination: {destination_mac}, Source: {source_mac}, Protocol: {ethernet_protocol}')
 
+    if ethernet_protocol == 8:
+        version, header_length, time_to_live, protocol, source, target, data = ipv4_packet(data)
+        print('IPv4 Packet:')
+        print(f'Version: {version}, Header Length: {header_length}, Time To Live: {time_to_live}, Protocol: {protocol}, Source: {source}, Target: {target} ')
             # ICMP
-            if protocol == 1:
-                icmp_type, code, checksum, data = icmp_packet(data)
-                print('ICMP Packet')
-                print(f'Type: {icmp_type}, Code: {code}, Checksum: {checksum}')
-                print(f'Data:\n{data}')
+        if protocol == 1:
+            icmp_type, code, checksum, data = icmp_packet(data)
+            print('ICMP Packet')
+            print(f'Type: {icmp_type}, Code: {code}, Checksum: {checksum}')
+            print(f'Data:\n{data}')
+            return ("ICMP",source,target)
+
 
             # TCP   
-            if protocol == 6:
-                source_port, destination_port, sequence, acknowledgement, flag_urg, flag_ack, flag_fin, flag_psh, flag_rst, flag_syn, data = tcp_segment(data)
-                print("TCP Segment:")
-                print(f"Source Port: {source_port}, Destination Port: {destination_port}\nSequence: {sequence}, Ackknowledgement: {acknowledgement}")
-                print(f"URG: {flag_urg}, ACK: {flag_ack}, FIN: {flag_fin}, PSH: {flag_psh}, RST: {flag_rst}, SYN: {flag_rst}, SYN: {flag_syn}")
-                print(f'Data:\n{data}')
+        if protocol == 6:
+            source_port, destination_port, sequence, acknowledgement, flag_urg, flag_ack, flag_fin, flag_psh, flag_rst, flag_syn, data = tcp_segment(data)
+            print("TCP Segment:")
+            print(f"Source Port: {source_port}, Destination Port: {destination_port}\nSequence: {sequence}, Ackknowledgement: {acknowledgement}")
+            print(f"URG: {flag_urg}, ACK: {flag_ack}, FIN: {flag_fin}, PSH: {flag_psh}, RST: {flag_rst}, SYN: {flag_rst}, SYN: {flag_syn}")
+            print(f'Data:\n{data}')
+            return ("TCP",source,target,source_port,destination_port)
 
             # UDP
-            elif protocol == 17:
-                source_port, destination_port, size, data = udp_segment(data)
-                print("UDP Segment:")
-                print(f"Source Port: {source_port}, Destination Port: {destination_port}, Length: {size}")
+        elif protocol == 17:
+            source_port, destination_port, size, data = udp_segment(data)
+            print("UDP Segment:")
+            print(f"Source Port: {source_port}, Destination Port: {destination_port}, Length: {size}")
+            return ("UPD",source,target,source_port,destination_port)
 
-            else:
-                print(f'Data:\n{data}')
         else:
             print(f'Data:\n{data}')
-
-
+            return ("unknown protocol",)
+    else:
+        print(f'Data:\n{data}')
+        return ("ipv6",)
 
 # get formatted mac address
 def get_mac_address(bytes_address):
@@ -91,4 +96,4 @@ def udp_segment(data):
      return source_port, destination_port, size, data[8:]
     
 
-main()
+# main()
