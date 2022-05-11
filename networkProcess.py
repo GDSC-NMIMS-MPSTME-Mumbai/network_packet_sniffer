@@ -7,6 +7,8 @@ class Packet():
 
 class NetworkProcessWorker(QObject):
     packet = pyqtSignal(tuple)
+    finished = pyqtSignal()
+
     # listen for packets (socket connection, infinite loop)
     def getConnection():
         connection = socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.ntohs(3)) # connect and take care of big endian <-> little endian
@@ -66,7 +68,7 @@ class NetworkProcessWorker(QObject):
     def run(self):
         # connection = getConnection()
         connection = socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.ntohs(3)) # connect and take care of big endian <-> little endian
-
+        run5times = 5
         while True:
             raw_data, address = connection.recvfrom(65535)
             destination_mac, source_mac, ethernet_protocol, data = self.get_ethernet_frame(raw_data)
@@ -112,6 +114,7 @@ class NetworkProcessWorker(QObject):
                 print(f'Data:\n{data}')
                 # return ("ipv6",)
                 self.packet.emit(("ipv6",))
-
+        print("done")
+        self.finished.emit()
 
     # main()

@@ -22,6 +22,8 @@ class UI(QMainWindow):
 		self.setCentralWidget(self.widget)
 		self.scan = False
 
+		self.thread = QThread()
+		self.worker = networkProcess.NetworkProcessWorker()
 
 	def displayMenu(self):
 		mainMenu = self.menuBar()
@@ -48,29 +50,31 @@ class UI(QMainWindow):
 		self.show()
 
 	def runNetworkProcess(self):
-		self.thread = QThread()
-		self.worker = networkProcess.NetworkProcessWorker()
+		# self.thread = QThread()
+		# self.worker = networkProcess.NetworkProcessWorker()
+		
+		# moves the worker class to the thread
+		self.worker.moveToThread(self.thread)
 		self.thread.started.connect(self.worker.run)
+		self.worker.finished.connect(self.worker.deleteLater) 
+		self.thread.finished.connect(self.thread.deleteLater)
 		self.worker.packet.connect(self.table_widget.updateTable)
-
 		self.thread.start()
+
 
 	# Button functions
 	
 	def onClickStart(self):
 		# adds a new row to the table on click of the button
-
-		# self.scan = True
-		# connection = networkProcess.getConnection()
-		# infinite loop will need to be run in seperate thread instead
-		# while self.scan:
-			# self.table_widget.updateTable(networkProcess.main(connection))
-		# self.table_widget.updateTable(networkProcess.main(connection))
-		self.runNetworkProcess()
+		if not self.thread.isRunning():
+			self.runNetworkProcess()
 
 
 	def onClickStop(self):
-		self.scan = False
+		# stop the thread here somehow
+		# self.worker.finished.emit()
+		# self.thread.quit()
+		print(self.thread.isRunning())
 
 # Generate Table
 
