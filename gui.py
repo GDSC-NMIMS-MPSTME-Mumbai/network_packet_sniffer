@@ -1,4 +1,5 @@
 from PyQt5.QtWidgets import *
+from PyQt5.QtCore import QObject, QThread, pyqtSignal
 import sys
 # import functions
 import networkProcess
@@ -46,18 +47,26 @@ class UI(QMainWindow):
 
 		self.show()
 
+	def runNetworkProcess(self):
+		self.thread = QThread()
+		self.worker = networkProcess.NetworkProcessWorker()
+		self.thread.started.connect(self.worker.run)
+		self.worker.packet.connect(self.table_widget.updateTable)
+
+		self.thread.start()
+
 	# Button functions
 	
 	def onClickStart(self):
 		# adds a new row to the table on click of the button
 
 		# self.scan = True
-		connection = networkProcess.getConnection()
+		# connection = networkProcess.getConnection()
 		# infinite loop will need to be run in seperate thread instead
 		# while self.scan:
 			# self.table_widget.updateTable(networkProcess.main(connection))
-		self.table_widget.updateTable(networkProcess.main(connection))
-
+		# self.table_widget.updateTable(networkProcess.main(connection))
+		self.runNetworkProcess()
 
 
 	def onClickStop(self):
@@ -85,19 +94,20 @@ class setTable(QWidget):
 		self.tableWidget.setColumnCount(5)
 		self.tableWidget.setHorizontalHeaderLabels(['Protocol', 'Source IP', 'Destination IP', 'Source Port', 'Destination port'])
 		
-		# self.tableWidget.setItem(0,0, QTableWidgetItem('test'))  # get items dynamically (functions.py)
-
-
+		self.tableWidget.setItem(0,0, QTableWidgetItem('test'))  # get items dynamically (functions.py)
 		self.tableWidget.resizeColumnsToContents()
 
 	def updateTable(self,row):
 		# add a row to the end of the table
+		print("________________________updatung tabke_________________________________________-")
 		rowPos = self.tableWidget.rowCount()
 		self.tableWidget.insertRow(rowPos)
 		# self.tableWidget.setRowCount(self.tableWidget.rowCount()+1)
 		itemCount = 0
 		for item in row:
 			self.tableWidget.setItem(rowPos,itemCount, QTableWidgetItem(str(row[itemCount])))
+			# self.tableWidget.setItem(rowPos,itemCount, QTableWidgetItem("test"))
+			print(f"inserted into table ------------{row[itemCount]}-------------")
 			itemCount+=1
 
 def main():
