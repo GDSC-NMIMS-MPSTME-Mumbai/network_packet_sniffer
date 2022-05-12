@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import *
-from PyQt5.QtCore import QObject, QThread, pyqtSignal
+from PyQt5.QtCore import QObject, QThread, pyqtSignal, Qt
 import sys
 # import functions
 # import networkProcess
@@ -8,8 +8,10 @@ import networkProcesses
 class UI(QMainWindow):
 	def __init__(self):
 		QWidget.__init__(self)
-		self.setFixedHeight(600) # autofit table contents and resize the window
-		self.setFixedWidth(800)
+		# self.setFixedHeight(600) # autofit table contents and resize the window
+		# self.setFixedWidth(800)
+		self.setMinimumHeight(600)
+		self.setMinimumWidth(800)
 
 		self.setWindowTitle('Network Packet Sniffer')
 		self.displayMenu()
@@ -25,6 +27,18 @@ class UI(QMainWindow):
 
 		self.thread = QThread()
 		self.worker = networkProcesses.NetworkProcessWorker()
+
+		# Dock widget to display data 
+		self.createDockWidget()
+		self.show()
+
+	def createDockWidget(self):
+		self.dock = QDockWidget("Data", self)
+		self.listWiget = QListWidget()
+		self.dock.setWidget(self.listWiget)
+		# self.dock.setStyleSheet()
+		self.addDockWidget(Qt.BottomDockWidgetArea, self.dock)
+
 
 	def displayMenu(self):
 		mainMenu = self.menuBar()
