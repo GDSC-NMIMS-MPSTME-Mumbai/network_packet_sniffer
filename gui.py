@@ -2,7 +2,8 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import QObject, QThread, pyqtSignal
 import sys
 # import functions
-import networkProcess
+# import networkProcess
+import networkProcesses
 
 class UI(QMainWindow):
 	def __init__(self):
@@ -23,7 +24,7 @@ class UI(QMainWindow):
 		self.scan = False
 
 		self.thread = QThread()
-		self.worker = networkProcess.NetworkProcessWorker()
+		self.worker = networkProcesses.NetworkProcessWorker()
 
 	def displayMenu(self):
 		mainMenu = self.menuBar()
@@ -39,13 +40,9 @@ class UI(QMainWindow):
 
 		# Buttons
 
-		startbutton = QPushButton('Start Capturing', self)
-		startbutton.clicked.connect(self.onClickStart)
-		startbutton.setGeometry(150, 0, 120, 25)
-
-		stopbutton = QPushButton('Stop Capturing', self)
-		stopbutton.setGeometry(280, 0, 120, 25)
-		stopbutton.clicked.connect(self.onClickStop)
+		self.startbutton = QPushButton('Start Capturing', self)
+		self.startbutton.clicked.connect(self.onClickStart)
+		self.startbutton.setGeometry(150, 0, 120, 25)
 
 		self.show()
 
@@ -54,27 +51,33 @@ class UI(QMainWindow):
 		# self.worker = networkProcess.NetworkProcessWorker()
 		
 		# moves the worker class to the thread
+		self.startbutton.setText('Stop Capturing')
+		self.threads = []
 		self.worker.moveToThread(self.thread)
 		self.thread.started.connect(self.worker.run)
 		self.worker.finished.connect(self.worker.deleteLater) 
 		self.thread.finished.connect(self.thread.deleteLater)
 		self.worker.packet.connect(self.table_widget.updateTable)
-		self.thread.start()
+		self.threads.append(self.worker)
+		self.worker.start()
 
 
 	# Button functions
 	
 	def onClickStart(self):
 		# adds a new row to the table on click of the button
-		if not self.thread.isRunning():
+		networkProcesses.isRun
+
+		if self.startbutton.text() == 'Start Capturing':
+			print('yes')
+			networkProcesses.isRun = True
 			self.runNetworkProcess()
+		
+		else:
+			networkProcesses.isRun = False
+			print('Done!')
 
-
-	def onClickStop(self):
-		# stop the thread here somehow
-		# self.worker.finished.emit()
-		# self.thread.quit()
-		print(self.thread.isRunning())
+			self.startbutton.setText('Start Capturing')
 
 # Generate Table
 
@@ -95,10 +98,12 @@ class setTable(QWidget):
 		# make a table with headers
 		self.tableWidget = QTableWidget()
 		self.tableWidget.setRowCount(0)
+		self.tableWidget.horizontalHeader().setStretchLastSection(True)
+
 		self.tableWidget.setColumnCount(5)
 		self.tableWidget.setHorizontalHeaderLabels(['Protocol', 'Source IP', 'Destination IP', 'Source Port', 'Destination port'])
 		
-		self.tableWidget.setItem(0,0, QTableWidgetItem('test'))  # get items dynamically (functions.py)
+		# self.tableWidget.setItem(0,0, QTableWidgetItem('test'))  # get items dynamically (functions.py)
 		self.tableWidget.resizeColumnsToContents()
 
 	def updateTable(self,row):
