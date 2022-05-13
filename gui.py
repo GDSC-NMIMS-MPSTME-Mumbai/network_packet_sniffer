@@ -32,19 +32,16 @@ class UI(QMainWindow):
 		self.show()
 
 	def createDockWidget(self):
-		self.dock = QDockWidget("Data", self)
+		self.dock = QDockWidget("Information", self)
 		# self.listWiget = QListWidget()
 		self.dock.setWidget(self.listWiget)
-		# self.listWiget.addItems(['test'])
 		# self.dock.setStyleSheet()
 		self.addDockWidget(Qt.BottomDockWidgetArea, self.dock)
 
 	def updateDock(self):
 		print(info)
-		# UI.listWiget = QListWidget()
 		self.listWiget.clear()
 		self.listWiget.addItems(['Protocol ', info[0], '------------','Source IP', info[1], '------------',  'Destination IP', info[2], '------------',  'Source Port', info[3], '------------',  'Destination port', info[4], '------------',  'Data', info[5]])
-		# pass
 		
 
 	def displayMenu(self):
@@ -61,18 +58,19 @@ class UI(QMainWindow):
 
 		# Buttons
 
-		self.startbutton = QPushButton('Start Capturing', self)
+		self.startbutton = QPushButton('Start Capturing', self) 
+		# self.startbutton.setStyleSheet() -> set icon and colour
 		self.startbutton.clicked.connect(self.onClickStart)
-		self.startbutton.setGeometry(150, 0, 120, 25)
+		self.startbutton.setGeometry(150, 0, 120, 20)
 
 		self.show()
 
 	def runNetworkProcess(self):
-		# self.thread = QThread()
-		# self.worker = networkProcess.NetworkProcessWorker()
-		
 		# moves the worker class to the thread
+
 		self.startbutton.setText('Stop Capturing')
+		# self.startbutton.setStyleSheet() -> set icon and colour
+
 		self.threads = []
 		self.worker.moveToThread(self.thread)
 		self.thread.started.connect(self.worker.run)
@@ -154,14 +152,10 @@ class setTable(QWidget):
 			UI.updateDock(UI)
 			
 
-
 def main():
 	app = QApplication(sys.argv)
 	window = UI()
 	window.show()
-	
-
 	sys.exit(app.exec_())
-
 
 main()

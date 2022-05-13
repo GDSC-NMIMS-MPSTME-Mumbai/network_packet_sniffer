@@ -112,17 +112,17 @@ class NetworkProcessWorker(QThread):
                     source_port, destination_port, size, data = self.udp_segment(data)
                     print("UDP Segment:")
                     print(f"Source Port: {source_port}, Destination Port: {destination_port}, Length: {size}")
-                    # return ("UPD",source,target,source_port,destination_port)
-                    self.packet.emit(("UPD",source,target,source_port,destination_port,f"Length: {size}"))
+                    # return ("UDP",source,target,source_port,destination_port)
+                    self.packet.emit(("UDP",source,target,source_port,destination_port,f"Length: {size}"))
 
                 else:
                     print(f'Data:\n{data}')
                     # return ("unknown protocol",)
-                    self.packet.emit(("unknown protocol",))
+                    self.packet.emit(("Unknown Protocol",))
             else:
                 print(f'Data:\n{data}')
-                # return ("ipv6",)
-                self.packet.emit(("ipv6",'-','-','-','-',data))
+                # return ("IPv6",)
+                self.packet.emit(("IPv6",'-','-','-','-',data))
         self.quit()
         print("quit")
 
