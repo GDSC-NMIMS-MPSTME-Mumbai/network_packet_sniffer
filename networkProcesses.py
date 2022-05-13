@@ -94,18 +94,18 @@ class NetworkProcessWorker(QThread):
                     print(f'Type: {icmp_type}, Code: {code}, Checksum: {checksum}')
                     print(f'Data:\n{data}')
                     # return ("ICMP",source,target)
-                    self.packet.emit(("ICMP",source,target))
+                    self.packet.emit(("ICMP",source,target, f"Type: {icmp_type}, Code: {code}, Checksum: {checksum}, Data: {data}"))
 
 
                     # TCP   
                 if protocol == 6:
                     source_port, destination_port, sequence, acknowledgement, flag_urg, flag_ack, flag_fin, flag_psh, flag_rst, flag_syn, data = self.tcp_segment(data)
                     print("TCP Segment:")
-                    print(f"Source Port: {source_port}, Destination Port: {destination_port}\nSequence: {sequence}, Ackknowledgement: {acknowledgement}")
+                    print(f"Source Port: {source_port}, Destination Port: {destination_port}\nSequence: {sequence}, Acknowledgement: {acknowledgement}")
                     print(f"URG: {flag_urg}, ACK: {flag_ack}, FIN: {flag_fin}, PSH: {flag_psh}, RST: {flag_rst}, SYN: {flag_rst}, SYN: {flag_syn}")
                     print(f'Data:\n{data}')
                     # return ("TCP",source,target,source_port,destination_port)
-                    self.packet.emit(("TCP",source,target,source_port,destination_port))
+                    self.packet.emit(("TCP",source,target,source_port,destination_port,f"{data}, Sequence: {sequence}, Acknowledgement: {acknowledgement}, URG: {flag_urg}, ACK: {flag_ack}, FIN: {flag_fin}, PSH: {flag_psh}, RST: {flag_rst}, SYN: {flag_rst}, SYN: {flag_syn}"))
 
                     # UDP
                 elif protocol == 17:
@@ -113,7 +113,7 @@ class NetworkProcessWorker(QThread):
                     print("UDP Segment:")
                     print(f"Source Port: {source_port}, Destination Port: {destination_port}, Length: {size}")
                     # return ("UPD",source,target,source_port,destination_port)
-                    self.packet.emit(("UPD",source,target,source_port,destination_port))
+                    self.packet.emit(("UPD",source,target,source_port,destination_port,f"Length: {size}"))
 
                 else:
                     print(f'Data:\n{data}')
@@ -122,7 +122,7 @@ class NetworkProcessWorker(QThread):
             else:
                 print(f'Data:\n{data}')
                 # return ("ipv6",)
-                self.packet.emit(("ipv6",))
+                self.packet.emit(("ipv6",'-','-','-','-',data))
         self.quit()
         print("quit")
 
