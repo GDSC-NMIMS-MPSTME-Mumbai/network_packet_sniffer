@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import QObject, QThread, pyqtSignal, Qt
 import sys
 import networkProcesses
+import csv
 info = []
 
 class UI(QMainWindow):
@@ -43,15 +44,57 @@ class UI(QMainWindow):
 		self.listWiget.clear()
 		self.listWiget.addItems(['Protocol ', info[0], '------------','Source IP', info[1], '------------',  'Destination IP', info[2], '------------',  'Source Port', info[3], '------------',  'Destination port', info[4], '------------',  'Data', info[5]])
 		
+	def exportCall(self):
+		print("export clicked")
 
+		# get absolute file name from dialog
+		fileName = QFileDialog.getSaveFileName(filter="CSV(*.csv)")
+		if fileName[0] == "":
+			return
+		fileName = fileName[0] + ".csv"
+		print(fileName)
+
+		# get table contents
+		tableContents = []
+		for rowNo in range(self.table_widget.tableWidget.rowCount()):
+			row = []
+			for colNo in range(self.table_widget.tableWidget.columnCount()):
+				# print(self.table_widget.tableWidget.item(colNo,rowNo).text())
+				item = self.table_widget.tableWidget.item(rowNo,colNo)
+				if item:
+					item = item.text()
+				# row.append(self.table_widget.tableWidget.item(rowNo,colNo).text())
+				row.append(item)
+				print(item)
+			# print(row)
+			tableContents.append(row)
+
+		# save it to csv at filename
+		fields = ["Protocol","Source IP","Destination IP","Source Port","Destination Port","Data"]
+		with open(fileName,'w') as csvfile:
+			csvwriter = csv.writer(csvfile)
+			csvwriter.writerow(fields)
+			csvwriter.writerows(tableContents)
+	
+	
+	def importCall(self):
+		print("import clicked")
+	
 	def displayMenu(self):
 		mainMenu = self.menuBar()
 
-		# Menu Items
+		# defining actions
+		exportAction = QAction('Export to .csv',self)
+		exportAction.triggered.connect(self.exportCall)
+		importAction = QAction('import from .csv',self)
+		importAction.triggered.connect(self.importCall)
+
+		# Menu Items 
 
 		fileMenu = mainMenu.addMenu('File')
-		fileMenu.addAction('Export to .csv')
-		fileMenu.addAction('Import from .csv')
+		# fileMenu.addAction('Export to .csv')
+		fileMenu.addAction(exportAction)
+		fileMenu.addAction(importAction)
 		
 		filterMenu = mainMenu.addMenu('Filter')
 		aboutMenu = mainMenu.addMenu('About')
