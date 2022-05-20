@@ -79,6 +79,24 @@ class UI(QMainWindow):
 	
 	def importCall(self):
 		print("import clicked")
+		fileName = QFileDialog.getOpenFileName(filter="CSV(*.csv)")
+		if fileName[0] == "":
+			return
+		fileName = fileName[0]
+		print(fileName)
+
+		self.table_widget.tableWidget.clearContents()
+		self.table_widget.tableWidget.setRowCount(0)
+		with open(fileName,mode='r')as file:
+			csvfile = csv.reader(file)
+			count = 0
+			for line in csvfile:
+				if count==0:
+					pass
+				else:
+					print(line)
+					self.table_widget.updateTable(line)
+				count +=1
 	
 	def displayMenu(self):
 		mainMenu = self.menuBar()
@@ -86,7 +104,7 @@ class UI(QMainWindow):
 		# defining actions
 		exportAction = QAction('Export to .csv',self)
 		exportAction.triggered.connect(self.exportCall)
-		importAction = QAction('import from .csv',self)
+		importAction = QAction('Import from .csv',self)
 		importAction.triggered.connect(self.importCall)
 
 		# Menu Items 
@@ -167,6 +185,7 @@ class setTable(QWidget):
 		# self.tableWidget.setItem(0,0, QTableWidgetItem('test'))  # get items dynamically (functions.py)
 		self.tableWidget.resizeColumnsToContents()
 		self.tableWidget.cellClicked.connect(self.cellClick)
+	
 	def updateTable(self,row):
 		# add a row to the end of the table
 		print("________________________updating table_________________________________________-")
