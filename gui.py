@@ -1,4 +1,3 @@
-from re import U
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import QObject, QThread, pyqtSignal, Qt
 import sys
@@ -168,10 +167,14 @@ class setTable(QWidget):
 	def tableInterface(self):
 		self.fetchTable()
 		self.layout = QVBoxLayout()
+		self.search = QLineEdit(self)
+		self.search.setText('Search...')
+		self.layout.addWidget(self.search)
 		self.layout.addWidget(self.tableWidget)
 		self.setLayout(self.layout)
 
 		self.show()
+		self.search.textChanged.connect(self.searchItem)
 
 	def fetchTable(self):
 		# make a table with headers
@@ -188,7 +191,7 @@ class setTable(QWidget):
 	
 	def updateTable(self,row):
 		# add a row to the end of the table
-		print("________________________updating table_________________________________________-")
+		print("________________________updating table_________________________________________")
 		rowPos = self.tableWidget.rowCount()
 		self.tableWidget.insertRow(rowPos)
 		# self.tableWidget.setRowCount(self.tableWidget.rowCount()+1)
@@ -212,6 +215,13 @@ class setTable(QWidget):
 				info.append(self.tableWidget.item(self.curr.row(), i).text())
 			# print(info)
 			UI.updateDock(UI)
+
+
+	def searchItem(self):
+		query = self.search.text()
+		for i in range(self.tableWidget.rowCount()):
+			item = self.tableWidget.item(i, 0)
+			self.tableWidget.setRowHidden(i, query not in item.text())
 			
 
 def main():
