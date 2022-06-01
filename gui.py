@@ -14,7 +14,8 @@ class UI(QMainWindow):
         self.setMinimumHeight(600)
         self.setMinimumWidth(800)
 
-        self.setWindowTitle("Network Packet Sniffer")
+        # think of a better name
+        self.setWindowTitle("Sniff")
         self.displayMenu()
 
         self.table_widget = setTable()
@@ -197,7 +198,7 @@ class setTable(QWidget):
         self.fetchTable()
         self.layout = QVBoxLayout()
         self.search = QLineEdit(self)
-        self.search.setText("Search...")
+        self.search.setPlaceholderText("Search...")
         self.layout.addWidget(self.search)
         self.layout.addWidget(self.tableWidget)
         self.setLayout(self.layout)
@@ -254,7 +255,8 @@ class setTable(QWidget):
             # print(self.curr.row(), self.curr.column(), self.curr.text())
             for i in range(6):
                 # print(self.tableWidget.item(self.curr.row(), i).text())
-                info.append(self.tableWidget.item(self.curr.row(), i).text())
+                if self.tableWidget.item(self.curr.row(), i):
+                    info.append(self.tableWidget.item(self.curr.row(), i).text())
             # print(info)
             UI.updateDock(UI)
 
